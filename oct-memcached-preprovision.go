@@ -89,11 +89,11 @@ func insertnew(name string, plan string, claimed string) {
 	err = db.QueryRow("INSERT INTO provision(name,plan,claimed) VALUES($1,$2,$3) returning name;", name, plan, claimed).Scan(&newname)
 
 	if err != nil {
+		defer db.Close()
 		fmt.Println(err)
 		os.Exit(2)
 	}
 	fmt.Println(newname)
-	err = db.Close()
 }
 
 func main() {
@@ -101,6 +101,7 @@ func main() {
 	uri := os.Getenv("BROKER_DB")
 	db, err := sql.Open("postgres", uri)
 	if err != nil {
+		defer db.Close()
 		fmt.Println(err)
 		os.Exit(2)
 	}
@@ -152,6 +153,5 @@ func main() {
 		fmt.Println(newname)
 		insertnew(newname, "large", "no")
 	}
-	err = db.Close()
 
 }
