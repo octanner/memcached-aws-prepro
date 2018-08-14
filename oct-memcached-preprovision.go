@@ -92,8 +92,8 @@ func insertnew(name string, plan string, claimed string) {
 		fmt.Println(err)
 		os.Exit(2)
 	}
+	defer db.Close()
 	fmt.Println(newname)
-	err = db.Close()
 }
 
 func main() {
@@ -104,6 +104,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
+	defer db.Close()
 
 	newname := "new"
 
@@ -152,6 +153,5 @@ func main() {
 		fmt.Println(newname)
 		insertnew(newname, "large", "no")
 	}
-	err = db.Close()
 
 }
