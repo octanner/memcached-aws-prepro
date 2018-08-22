@@ -87,6 +87,7 @@ func insertnew(name string, plan string, claimed string) {
 		fmt.Println(err)
 		os.Exit(2)
 	}
+	defer db.Close()
 	var newname string
 	err = db.QueryRow("INSERT INTO provision(name,plan,claimed) VALUES($1,$2,$3) returning name;", name, plan, claimed).Scan(&newname)
 
@@ -94,7 +95,6 @@ func insertnew(name string, plan string, claimed string) {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	defer db.Close()
 	fmt.Println(newname)
 }
 
@@ -106,18 +106,17 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
+	defer db.Close()
 
 	// setup the database (or modify it as necessary)
 	buf, err := ioutil.ReadFile("create.sql")
 	if err != nil {
 		log.Fatalf("Unable to read create.sql: %s\n", err)
 	}
-	_, err = db.Query(string(buf))
+	_, err = db.Exec(string(buf))
 	if err != nil {
 		log.Fatal("Unable to create database: %s\n", err)
 	}
-
-	defer db.Close()
 
 	newname := "new"
 
