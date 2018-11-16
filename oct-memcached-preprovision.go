@@ -27,17 +27,17 @@ func provision(plan string) string {
 	fmt.Println(name)
 
 	if plan == "small" {
-		cacheparametergroupname = "memcached-14-small"
+		cacheparametergroupname = os.Getenv("SMALL_PARAMETER_GROUP")
 		cachenodetype = os.Getenv("SMALL_INSTANCE_TYPE")
 		numcachenodes = int64(1)
 	}
 	if plan == "medium" {
-		cacheparametergroupname = "memcached-14-medium"
+		cacheparametergroupname = os.Getenv("MEDIUM_PARAMETER_GROUP")
 		cachenodetype = os.Getenv("MEDIUM_INSTANCE_TYPE")
 		numcachenodes = int64(1)
 	}
 	if plan == "large" {
-		cacheparametergroupname = "memcached-14-large"
+		cacheparametergroupname = os.Getenv("LARGE_PARAMETER_GROUP")
 		cachenodetype = os.Getenv("LARGE_INSTANCE_TYPE")
 		numcachenodes = int64(1)
 	}
