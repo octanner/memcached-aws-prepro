@@ -16,7 +16,7 @@ import (
 	"github.com/nu7hatch/gouuid"
 )
 
-func provision(plan string) string {
+func provision(db *sql.DB, plan string) string {
 
 	cacheparametergroupname := "memcached-14-small"
 	cachenodetype := os.Getenv("SMALL_INSTANCE_TYPE")
@@ -24,7 +24,6 @@ func provision(plan string) string {
 	billingcode := "pre-provisioned"
 	u, err := uuid.NewV4()
 	name := os.Getenv("NAME_PREFIX") + "-" + strings.Split(u.String(), "-")[0]
-	fmt.Println(name)
 
 	if plan == "small" {
 		cacheparametergroupname = os.Getenv("SMALL_PARAMETER_GROUP")
@@ -76,26 +75,17 @@ func provision(plan string) string {
 		return err.Error()
 	}
 
-	fmt.Println(resp)
 	return name
 }
 
-func insertnew(name string, plan string, claimed string) {
-	uri := os.Getenv("BROKER_DB")
-	db, err := sql.Open("postgres", uri)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
-	}
-	defer db.Close()
+func insertnew(db *sql.DB, name string, plan string, claimed string) {
 	var newname string
-	err = db.QueryRow("INSERT INTO provision(name,plan,claimed) VALUES($1,$2,$3) returning name;", name, plan, claimed).Scan(&newname)
+	err :=db.QueryRow("INSERT INTO provision(name,plan,claimed) VALUES($1,$2,$3) returning name;", name, plan, claimed).Scan(&newname)
 
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	fmt.Println(newname)
 }
 
 func main() {
@@ -130,12 +120,10 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	fmt.Println(smallcount)
 
 	if smallcount < provisionsmall {
-		newname = provision("small")
-		fmt.Println(newname)
-		insertnew(newname, "small", "no")
+		newname = provision(db, "small")
+		insertnew(db,newname, "small", "no")
 	}
 
 	var mediumcount int
@@ -144,12 +132,10 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	fmt.Println(mediumcount)
 
 	if mediumcount < provisionmedium {
-		newname = provision("medium")
-		fmt.Println(newname)
-		insertnew(newname, "medium", "no")
+		newname = provision(db, "medium")
+		insertnew(db, newname, "medium", "no")
 	}
 
 	var largecount int
@@ -158,12 +144,10 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	fmt.Println(largecount)
 
 	if largecount < provisionlarge {
-		newname = provision("large")
-		fmt.Println(newname)
-		insertnew(newname, "large", "no")
+		newname = provision(db, "large")
+		insertnew(db,newname, "large", "no")
 	}
 
 }
