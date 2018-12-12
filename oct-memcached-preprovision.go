@@ -24,7 +24,6 @@ func provision(db *sql.DB, plan string) string {
 	billingcode := "pre-provisioned"
 	u, err := uuid.NewV4()
 	name := os.Getenv("NAME_PREFIX") + "-" + strings.Split(u.String(), "-")[0]
-	fmt.Println(name)
 
 	if plan == "small" {
 		cacheparametergroupname = os.Getenv("SMALL_PARAMETER_GROUP")
@@ -76,7 +75,6 @@ func provision(db *sql.DB, plan string) string {
 		return err.Error()
 	}
 
-	fmt.Println(resp)
 	return name
 }
 
@@ -88,7 +86,6 @@ func insertnew(db *sql.DB, name string, plan string, claimed string) {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	fmt.Println(newname)
 }
 
 func main() {
@@ -123,11 +120,9 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	fmt.Println(smallcount)
 
 	if smallcount < provisionsmall {
 		newname = provision(db, "small")
-		fmt.Println(newname)
 		insertnew(db,newname, "small", "no")
 	}
 
@@ -137,11 +132,9 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	fmt.Println(mediumcount)
 
 	if mediumcount < provisionmedium {
 		newname = provision(db, "medium")
-		fmt.Println(newname)
 		insertnew(db, newname, "medium", "no")
 	}
 
@@ -151,11 +144,9 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	fmt.Println(largecount)
 
 	if largecount < provisionlarge {
 		newname = provision(db, "large")
-		fmt.Println(newname)
 		insertnew(db,newname, "large", "no")
 	}
 
