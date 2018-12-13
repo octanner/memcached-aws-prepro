@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
+        "time"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/elasticache"
@@ -17,7 +17,7 @@ import (
 )
 
 func provision(db *sql.DB, plan string) string {
-
+ 
 	cacheparametergroupname := "memcached-14-small"
 	cachenodetype := os.Getenv("SMALL_INSTANCE_TYPE")
 	numcachenodes := int64(1)
@@ -41,6 +41,10 @@ func provision(db *sql.DB, plan string) string {
 		numcachenodes = int64(1)
 	}
 
+        loc, _ := time.LoadLocation(os.Getenv("LOGTZ"))
+        now := time.Now().In(loc)
+        fmt.Printf("%v : provisioning %v named %v\n", now, plan, name)
+        
 	svc := elasticache.New(session.New(&aws.Config{
 		Region: aws.String(os.Getenv("REGION")),
 	}))
@@ -68,7 +72,7 @@ func provision(db *sql.DB, plan string) string {
 			},
 		},
 	}
-	resp, err := svc.CreateCacheCluster(params)
+	_, err = svc.CreateCacheCluster(params)
 
 	if err != nil {
 		fmt.Println(err.Error())
